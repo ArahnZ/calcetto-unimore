@@ -9,6 +9,7 @@ type PlayerStats = {
   photo_url: string | null;
   matches: number;
   goals: number;
+  own_goals: number;
   wins: number;
   draws: number;
   losses: number;
@@ -19,6 +20,7 @@ type MatchPlayer = {
   match_id: string;
   team: "A" | "B";
   goals: number;
+  own_goals: number;
   player_id: string;
   players: {
     id: string;
@@ -40,7 +42,8 @@ export default function Home() {
   const [players, setPlayers] = useState<PlayerStats[]>([]);
   const [matches, setMatches] = useState<Match[]>([]);
   const [loading, setLoading] = useState(true);
-  const [matchesLoading, setMatchesLoading] = useState(true);
+  const [matchesLoading, setMatchesLoading] =
+    useState(true);
 
   useEffect(() => {
     loadStats();
@@ -49,10 +52,14 @@ export default function Home() {
 
   async function loadStats() {
     try {
-      const response = await fetch("/api/stats");
+      const response = await fetch(
+        "/api/stats"
+      );
 
       if (!response.ok) {
-        throw new Error("Errore caricamento classifica");
+        throw new Error(
+          "Errore caricamento classifica"
+        );
       }
 
       const data = await response.json();
@@ -66,10 +73,14 @@ export default function Home() {
 
   async function loadMatches() {
     try {
-      const response = await fetch("/api/public/matches");
+      const response = await fetch(
+        "/api/public/matches"
+      );
 
       if (!response.ok) {
-        throw new Error("Errore caricamento partite");
+        throw new Error(
+          "Errore caricamento partite"
+        );
       }
 
       const data = await response.json();
@@ -81,32 +92,40 @@ export default function Home() {
     }
   }
 
-  // Classifica marcatori:
-  // 1. Gol totali
-  // 2. Gol per partita
-  // 3. Nome alfabetico
-  const scorers = [...players].sort((a, b) => {
-    if (b.goals !== a.goals) {
-      return b.goals - a.goals;
+  const scorers = [...players].sort(
+    (a, b) => {
+      if (b.goals !== a.goals) {
+        return b.goals - a.goals;
+      }
+
+      const goalsPerMatchA =
+        a.matches > 0
+          ? a.goals / a.matches
+          : 0;
+
+      const goalsPerMatchB =
+        b.matches > 0
+          ? b.goals / b.matches
+          : 0;
+
+      if (
+        goalsPerMatchB !==
+        goalsPerMatchA
+      ) {
+        return (
+          goalsPerMatchB -
+          goalsPerMatchA
+        );
+      }
+
+      return a.name.localeCompare(
+        b.name
+      );
     }
-
-    const goalsPerMatchA =
-      a.matches > 0 ? a.goals / a.matches : 0;
-
-    const goalsPerMatchB =
-      b.matches > 0 ? b.goals / b.matches : 0;
-
-    if (goalsPerMatchB !== goalsPerMatchA) {
-      return goalsPerMatchB - goalsPerMatchA;
-    }
-
-    return a.name.localeCompare(b.name);
-  });
+  );
 
   return (
     <main className="min-h-screen bg-gray-100 text-gray-900">
-      {/* HEADER */}
-
       <header className="border-b border-gray-200 bg-white">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-5">
           <div>
@@ -129,11 +148,6 @@ export default function Home() {
       </header>
 
       <div className="mx-auto max-w-6xl px-4 py-8">
-
-        {/* ========================= */}
-        {/* CLASSIFICA */}
-        {/* ========================= */}
-
         <section className="mb-8">
           <div className="mb-5">
             <h2 className="text-3xl font-bold">
@@ -194,73 +208,93 @@ export default function Home() {
                   </thead>
 
                   <tbody>
-                    {players.map((player, index) => {
-                      const pointsPerMatch =
-                        player.matches > 0
-                          ? player.points / player.matches
-                          : 0;
+                    {players.map(
+                      (player, index) => {
+                        const pointsPerMatch =
+                          player.matches >
+                          0
+                            ? player.points /
+                              player.matches
+                            : 0;
 
-                      return (
-                        <tr
-                          key={player.id}
-                          className="border-t border-gray-100 transition hover:bg-gray-50"
-                        >
-                          <td className="px-5 py-4 font-bold">
-                            {index + 1}
-                          </td>
+                        return (
+                          <tr
+                            key={
+                              player.id
+                            }
+                            className="border-t border-gray-100 transition hover:bg-gray-50"
+                          >
+                            <td className="px-5 py-4 font-bold">
+                              {index + 1}
+                            </td>
 
-                          <td className="px-5 py-4">
-                            <div className="font-semibold">
-                              {player.name}
-                            </div>
-
-                            {player.nickname && (
-                              <div className="text-sm text-gray-500">
-                                {player.nickname}
+                            <td className="px-5 py-4">
+                              <div className="font-semibold">
+                                {
+                                  player.name
+                                }
                               </div>
-                            )}
-                          </td>
 
-                          <td className="px-5 py-4 text-center">
-                            {player.matches}
-                          </td>
+                              {player.nickname && (
+                                <div className="text-sm text-gray-500">
+                                  {
+                                    player.nickname
+                                  }
+                                </div>
+                              )}
+                            </td>
 
-                          <td className="px-5 py-4 text-center">
-                            {player.wins}
-                          </td>
+                            <td className="px-5 py-4 text-center">
+                              {
+                                player.matches
+                              }
+                            </td>
 
-                          <td className="px-5 py-4 text-center">
-                            {player.draws}
-                          </td>
+                            <td className="px-5 py-4 text-center">
+                              {
+                                player.wins
+                              }
+                            </td>
 
-                          <td className="px-5 py-4 text-center">
-                            {player.losses}
-                          </td>
+                            <td className="px-5 py-4 text-center">
+                              {
+                                player.draws
+                              }
+                            </td>
 
-                          <td className="px-5 py-4 text-center font-semibold">
-                            {player.goals}
-                          </td>
+                            <td className="px-5 py-4 text-center">
+                              {
+                                player.losses
+                              }
+                            </td>
 
-                          <td className="px-5 py-4 text-center text-lg font-bold">
-                            {player.points}
-                          </td>
+                            <td className="px-5 py-4 text-center font-semibold">
+                              {
+                                player.goals
+                              }
+                            </td>
 
-                          <td className="px-5 py-4 text-center font-semibold">
-                            {pointsPerMatch.toFixed(2)}
-                          </td>
-                        </tr>
-                      );
-                    })}
+                            <td className="px-5 py-4 text-center text-lg font-bold">
+                              {
+                                player.points
+                              }
+                            </td>
+
+                            <td className="px-5 py-4 text-center font-semibold">
+                              {pointsPerMatch.toFixed(
+                                2
+                              )}
+                            </td>
+                          </tr>
+                        );
+                      }
+                    )}
                   </tbody>
                 </table>
               </div>
             )}
           </div>
         </section>
-
-        {/* ========================= */}
-        {/* CLASSIFICA MARCATORI */}
-        {/* ========================= */}
 
         <section className="mb-8">
           <div className="mb-5">
@@ -269,7 +303,7 @@ export default function Home() {
             </h2>
 
             <p className="mt-1 text-gray-500">
-              Gol totali e media gol per partita
+              Gol e autogol totali. Gli autogol non influenzano la posizione in classifica.
             </p>
           </div>
 
@@ -300,63 +334,85 @@ export default function Home() {
                       </th>
 
                       <th className="px-5 py-4 text-center">
+                        Autogol
+                      </th>
+
+                      <th className="px-5 py-4 text-center">
                         Gol/PG
                       </th>
                     </tr>
                   </thead>
 
                   <tbody>
-                    {scorers.map((player, index) => {
-                      const goalsPerMatch =
-                        player.matches > 0
-                          ? player.goals / player.matches
-                          : 0;
+                    {scorers.map(
+                      (player, index) => {
+                        const goalsPerMatch =
+                          player.matches >
+                          0
+                            ? player.goals /
+                              player.matches
+                            : 0;
 
-                      return (
-                        <tr
-                          key={player.id}
-                          className="border-t border-gray-100 transition hover:bg-gray-50"
-                        >
-                          <td className="px-5 py-4 font-bold">
-                            {index + 1}
-                          </td>
+                        return (
+                          <tr
+                            key={
+                              player.id
+                            }
+                            className="border-t border-gray-100 transition hover:bg-gray-50"
+                          >
+                            <td className="px-5 py-4 font-bold">
+                              {index + 1}
+                            </td>
 
-                          <td className="px-5 py-4">
-                            <div className="font-semibold">
-                              {player.name}
-                            </div>
-
-                            {player.nickname && (
-                              <div className="text-sm text-gray-500">
-                                {player.nickname}
+                            <td className="px-5 py-4">
+                              <div className="font-semibold">
+                                {
+                                  player.name
+                                }
                               </div>
-                            )}
-                          </td>
 
-                          <td className="px-5 py-4 text-center">
-                            {player.matches}
-                          </td>
+                              {player.nickname && (
+                                <div className="text-sm text-gray-500">
+                                  {
+                                    player.nickname
+                                  }
+                                </div>
+                              )}
+                            </td>
 
-                          <td className="px-5 py-4 text-center text-lg font-bold">
-                            {player.goals}
-                          </td>
+                            <td className="px-5 py-4 text-center">
+                              {
+                                player.matches
+                              }
+                            </td>
 
-                          <td className="px-5 py-4 text-center font-semibold">
-                            {goalsPerMatch.toFixed(2)}
-                          </td>
-                        </tr>
-                      );
-                    })}
+                            <td className="px-5 py-4 text-center text-lg font-bold">
+                              {
+                                player.goals
+                              }
+                            </td>
+
+                            <td className="px-5 py-4 text-center text-lg font-bold text-red-600">
+                              {
+                                player.own_goals
+                              }
+                            </td>
+
+                            <td className="px-5 py-4 text-center font-semibold">
+                              {goalsPerMatch.toFixed(
+                                2
+                              )}
+                            </td>
+                          </tr>
+                        );
+                      }
+                    )}
                   </tbody>
                 </table>
               </div>
             )}
           </div>
         </section>
-
-        {/* ========================= */}
-        {/* PARTITE */}
-        {/* ========================= */}
 
         <section>
           <div className="mb-5">
@@ -381,25 +437,32 @@ export default function Home() {
             ) : (
               <div className="divide-y divide-gray-100">
                 {matches.map((match) => {
-                  const teamAPlayers = match.players.filter(
-                    (player) => player.team === "A"
-                  );
+                  const teamAPlayers =
+                    match.players.filter(
+                      (player) =>
+                        player.team ===
+                        "A"
+                    );
 
-                  const teamBPlayers = match.players.filter(
-                    (player) => player.team === "B"
-                  );
+                  const teamBPlayers =
+                    match.players.filter(
+                      (player) =>
+                        player.team ===
+                        "B"
+                    );
 
                   return (
                     <div
                       key={match.id}
                       className="p-6"
                     >
-                      {/* TESTATA PARTITA */}
-
                       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                         <div>
                           <div className="text-sm font-semibold text-gray-500">
-                            Partita #{match.match_number}
+                            Partita #
+                            {
+                              match.match_number
+                            }
                           </div>
 
                           <div className="mt-1 text-sm text-gray-400">
@@ -417,13 +480,17 @@ export default function Home() {
                           </span>
 
                           <span className="rounded-xl bg-gray-100 px-5 py-3 text-2xl">
-                            {match.team_a_score}
+                            {
+                              match.team_a_score
+                            }
 
                             <span className="mx-2 text-gray-400">
                               -
                             </span>
 
-                            {match.team_b_score}
+                            {
+                              match.team_b_score
+                            }
                           </span>
 
                           <span>
@@ -432,12 +499,7 @@ export default function Home() {
                         </div>
                       </div>
 
-                      {/* GIOCATORI */}
-
                       <div className="mt-6 grid gap-4 sm:grid-cols-2">
-
-                        {/* TEAM A */}
-
                         <div className="rounded-xl bg-gray-50 p-4">
                           <h3 className="mb-3 font-bold">
                             Team A
@@ -447,25 +509,45 @@ export default function Home() {
                             {teamAPlayers.map(
                               (player) => (
                                 <div
-                                  key={player.player_id}
+                                  key={
+                                    player.player_id
+                                  }
                                   className="flex items-center justify-between"
                                 >
                                   <span>
-                                    {player.players.name}
+                                    {
+                                      player
+                                        .players
+                                        .name
+                                    }
                                   </span>
 
-                                  {player.goals > 0 && (
-                                    <span className="font-semibold">
-                                      ⚽ {player.goals}
-                                    </span>
-                                  )}
+                                  <div className="flex items-center gap-2 font-semibold">
+                                    {player.goals >
+                                      0 && (
+                                      <span>
+                                        ⚽{" "}
+                                        {
+                                          player.goals
+                                        }
+                                      </span>
+                                    )}
+
+                                    {player.own_goals >
+                                      0 && (
+                                      <span className="text-red-600">
+                                        🔴{" "}
+                                        {
+                                          player.own_goals
+                                        }
+                                      </span>
+                                    )}
+                                  </div>
                                 </div>
                               )
                             )}
                           </div>
                         </div>
-
-                        {/* TEAM B */}
 
                         <div className="rounded-xl bg-gray-50 p-4">
                           <h3 className="mb-3 font-bold">
@@ -476,24 +558,45 @@ export default function Home() {
                             {teamBPlayers.map(
                               (player) => (
                                 <div
-                                  key={player.player_id}
+                                  key={
+                                    player.player_id
+                                  }
                                   className="flex items-center justify-between"
                                 >
                                   <span>
-                                    {player.players.name}
+                                    {
+                                      player
+                                        .players
+                                        .name
+                                    }
                                   </span>
 
-                                  {player.goals > 0 && (
-                                    <span className="font-semibold">
-                                      ⚽ {player.goals}
-                                    </span>
-                                  )}
+                                  <div className="flex items-center gap-2 font-semibold">
+                                    {player.goals >
+                                      0 && (
+                                      <span>
+                                        ⚽{" "}
+                                        {
+                                          player.goals
+                                        }
+                                      </span>
+                                    )}
+
+                                    {player.own_goals >
+                                      0 && (
+                                      <span className="text-red-600">
+                                        🔴{" "}
+                                        {
+                                          player.own_goals
+                                        }
+                                      </span>
+                                    )}
+                                  </div>
                                 </div>
                               )
                             )}
                           </div>
                         </div>
-
                       </div>
                     </div>
                   );
@@ -502,7 +605,6 @@ export default function Home() {
             )}
           </div>
         </section>
-
       </div>
     </main>
   );

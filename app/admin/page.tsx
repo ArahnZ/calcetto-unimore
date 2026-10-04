@@ -40,6 +40,7 @@ export default function AdminPage() {
   >({});
 
   const [goals, setGoals] = useState<Record<string, number>>({});
+  const [ownGoals, setOwnGoals] = useState<Record<string, number>>({});
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -245,6 +246,20 @@ export default function AdminPage() {
     }));
   }
 
+  function changeOwnGoals(
+    playerId: string,
+    value: string
+  ) {
+    const number = Number(value);
+
+    setOwnGoals((current) => ({
+      ...current,
+      [playerId]: Number.isNaN(number)
+        ? 0
+        : number,
+    }));
+  }
+
   async function handleSave() {
     setError("");
     setMessage("");
@@ -324,6 +339,8 @@ export default function AdminPage() {
                   ],
                 goals:
                   goals[playerId] ?? 0,
+                ownGoals:
+                  ownGoals[playerId] ?? 0,
               })
             ),
           }),
@@ -366,6 +383,7 @@ export default function AdminPage() {
       setTeamBScore("");
       setSelectedPlayers({});
       setGoals({});
+      setOwnGoals({});
 
       await loadMatches();
     } catch (err) {
@@ -691,8 +709,8 @@ export default function AdminPage() {
 
             <p className="mt-1 text-sm text-gray-500">
               Seleziona i giocatori,
-              assegna il team e inserisci i
-              gol.
+              assegna il team e inserisci
+              gol e autogol.
             </p>
           </div>
 
@@ -796,6 +814,10 @@ export default function AdminPage() {
                       <th className="px-4 py-3">
                         Gol
                       </th>
+
+                      <th className="px-4 py-3">
+                        Autogol
+                      </th>
                     </tr>
                   </thead>
 
@@ -894,6 +916,35 @@ export default function AdminPage() {
                                     e
                                   ) =>
                                     changeGoals(
+                                      player.id,
+                                      e.target
+                                        .value
+                                    )
+                                  }
+                                  className="w-24 rounded-lg border border-gray-300 px-3 py-2"
+                                />
+                              ) : (
+                                <span className="text-gray-400">
+                                  —
+                                </span>
+                              )}
+                            </td>
+
+                            <td className="px-4 py-3">
+                              {selected ? (
+                                <input
+                                  type="number"
+                                  min="0"
+                                  value={
+                                    ownGoals[
+                                      player
+                                        .id
+                                    ] ?? 0
+                                  }
+                                  onChange={(
+                                    e
+                                  ) =>
+                                    changeOwnGoals(
                                       player.id,
                                       e.target
                                         .value

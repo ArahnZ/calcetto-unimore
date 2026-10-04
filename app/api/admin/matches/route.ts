@@ -152,11 +152,13 @@ export async function POST(request: NextRequest) {
       playerId: string;
       team: "A" | "B";
       goals: number;
+      ownGoals?: number;
     }) => ({
       match_id: matchId,
       player_id: player.playerId,
       team: player.team,
       goals: player.goals,
+      own_goals: player.ownGoals ?? 0,
     })
   );
 
