@@ -15,12 +15,25 @@ type PlayerStats = {
   points: number;
 };
 
+type MatchPlayer = {
+  match_id: string;
+  team: "A" | "B";
+  goals: number;
+  player_id: string;
+  players: {
+    id: string;
+    name: string;
+    nickname: string | null;
+  };
+};
+
 type Match = {
   id: string;
   match_number: number;
   team_a_score: number;
   team_b_score: number;
   played_at: string;
+  players: MatchPlayer[];
 };
 
 export default function Home() {
@@ -92,6 +105,8 @@ export default function Home() {
       </header>
 
       <div className="mx-auto max-w-6xl px-4 py-8">
+        {/* CLASSIFICA */}
+
         <section className="mb-8">
           <div className="mb-5">
             <h2 className="text-3xl font-bold">
@@ -115,12 +130,24 @@ export default function Home() {
                     <tr>
                       <th className="px-5 py-4">#</th>
                       <th className="px-5 py-4">Giocatore</th>
-                      <th className="px-5 py-4 text-center">PG</th>
-                      <th className="px-5 py-4 text-center">V</th>
-                      <th className="px-5 py-4 text-center">P</th>
-                      <th className="px-5 py-4 text-center">S</th>
-                      <th className="px-5 py-4 text-center">Gol</th>
-                      <th className="px-5 py-4 text-center">Pt</th>
+                      <th className="px-5 py-4 text-center">
+                        PG
+                      </th>
+                      <th className="px-5 py-4 text-center">
+                        V
+                      </th>
+                      <th className="px-5 py-4 text-center">
+                        P
+                      </th>
+                      <th className="px-5 py-4 text-center">
+                        S
+                      </th>
+                      <th className="px-5 py-4 text-center">
+                        Gol
+                      </th>
+                      <th className="px-5 py-4 text-center">
+                        Pt
+                      </th>
                     </tr>
                   </thead>
 
@@ -178,6 +205,8 @@ export default function Home() {
           </div>
         </section>
 
+        {/* PARTITE */}
+
         <section>
           <div className="mb-5">
             <h2 className="text-3xl font-bold">
@@ -200,38 +229,118 @@ export default function Home() {
               </div>
             ) : (
               <div className="divide-y divide-gray-100">
-                {matches.map((match) => (
-                  <div
-                    key={match.id}
-                    className="flex flex-col gap-3 p-5 sm:flex-row sm:items-center sm:justify-between"
-                  >
-                    <div>
-                      <div className="text-sm font-semibold text-gray-500">
-                        Partita #{match.match_number}
+                {matches.map((match) => {
+                  const teamAPlayers = match.players.filter(
+                    (player) => player.team === "A"
+                  );
+
+                  const teamBPlayers = match.players.filter(
+                    (player) => player.team === "B"
+                  );
+
+                  return (
+                    <div
+                      key={match.id}
+                      className="p-6"
+                    >
+                      {/* TESTATA PARTITA */}
+
+                      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                        <div>
+                          <div className="text-sm font-semibold text-gray-500">
+                            Partita #{match.match_number}
+                          </div>
+
+                          <div className="mt-1 text-sm text-gray-400">
+                            {new Date(
+                              match.played_at
+                            ).toLocaleDateString(
+                              "it-IT"
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="flex items-center justify-center gap-4 text-lg font-bold">
+                          <span>Team A</span>
+
+                          <span className="rounded-xl bg-gray-100 px-5 py-3 text-2xl">
+                            {match.team_a_score}
+
+                            <span className="mx-2 text-gray-400">
+                              -
+                            </span>
+
+                            {match.team_b_score}
+                          </span>
+
+                          <span>Team B</span>
+                        </div>
                       </div>
 
-                      <div className="mt-1 text-sm text-gray-400">
-                        {new Date(
-                          match.played_at
-                        ).toLocaleDateString("it-IT")}
+                      {/* GIOCATORI */}
+
+                      <div className="mt-6 grid gap-4 sm:grid-cols-2">
+                        {/* TEAM A */}
+
+                        <div className="rounded-xl bg-gray-50 p-4">
+                          <h3 className="mb-3 font-bold">
+                            Team A
+                          </h3>
+
+                          <div className="space-y-2">
+                            {teamAPlayers.map(
+                              (player) => (
+                                <div
+                                  key={player.player_id}
+                                  className="flex items-center justify-between"
+                                >
+                                  <span>
+                                    {player.players.name}
+                                  </span>
+
+                                  {player.goals > 0 && (
+                                    <span className="font-semibold">
+                                      ⚽ {player.goals}
+                                    </span>
+                                  )}
+                                </div>
+                              )
+                            )}
+                          </div>
+                        </div>
+
+                        {/* TEAM B */}
+
+                        <div className="rounded-xl bg-gray-50 p-4">
+                          <h3 className="mb-3 font-bold">
+                            Team B
+                          </h3>
+
+                          <div className="space-y-2">
+                            {teamBPlayers.map(
+                              (player) => (
+                                <div
+                                  key={player.player_id}
+                                  className="flex items-center justify-between"
+                                >
+                                  <span>
+                                    {player.players.name}
+                                  </span>
+
+                                  {player.goals > 0 && (
+                                    <span className="font-semibold">
+                                      ⚽ {player.goals}
+                                    </span>
+                                  )}
+                                </div>
+                              )
+                            )}
+                          </div>
+                        </div>
                       </div>
                     </div>
-
-                    <div className="flex items-center justify-center gap-5 text-lg font-bold">
-                      <span>Team A</span>
-
-                      <span className="rounded-xl bg-gray-100 px-5 py-3 text-2xl">
-                        {match.team_a_score}
-                        <span className="mx-2 text-gray-400">
-                          -
-                        </span>
-                        {match.team_b_score}
-                      </span>
-
-                      <span>Team B</span>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>
@@ -240,3 +349,4 @@ export default function Home() {
     </main>
   );
 }
+
