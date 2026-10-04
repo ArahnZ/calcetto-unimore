@@ -97,6 +97,7 @@ export async function POST(request: NextRequest) {
 
   const {
     matchNumber,
+    matchDate,
     teamAScore,
     teamBScore,
     players,
@@ -109,6 +110,13 @@ export async function POST(request: NextRequest) {
   ) {
     return NextResponse.json(
       { error: "Dati della partita non validi." },
+      { status: 400 }
+    );
+  }
+
+  if (!matchDate) {
+    return NextResponse.json(
+      { error: "Data della partita mancante." },
       { status: 400 }
     );
   }
@@ -127,6 +135,7 @@ export async function POST(request: NextRequest) {
     .insert({
       id: matchId,
       match_number: matchNumber,
+      played_at: `${matchDate}T12:00:00`,
       team_a_score: teamAScore,
       team_b_score: teamBScore,
     });

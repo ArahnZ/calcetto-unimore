@@ -31,6 +31,7 @@ export default function AdminPage() {
   const [matches, setMatches] = useState<Match[]>([]);
 
   const [matchNumber, setMatchNumber] = useState("");
+  const [matchDate, setMatchDate] = useState("");
   const [teamAScore, setTeamAScore] = useState("");
   const [teamBScore, setTeamBScore] = useState("");
 
@@ -277,6 +278,13 @@ export default function AdminPage() {
       return;
     }
 
+    if (!matchDate) {
+      setError(
+        "Inserisci la data della partita."
+      );
+      return;
+    }
+
     const selectedIds =
       Object.keys(selectedPlayers);
 
@@ -302,6 +310,7 @@ export default function AdminPage() {
           body: JSON.stringify({
             matchNumber:
               parsedMatchNumber,
+            matchDate,
             teamAScore:
               parsedTeamAScore,
             teamBScore:
@@ -352,6 +361,7 @@ export default function AdminPage() {
       );
 
       setMatchNumber("");
+      setMatchDate("");
       setTeamAScore("");
       setTeamBScore("");
       setSelectedPlayers({});
@@ -650,7 +660,7 @@ export default function AdminPage() {
                     <div className="mt-1 text-sm text-gray-400">
                       {new Date(
                         match.played_at
-                      ).toLocaleString(
+                      ).toLocaleDateString(
                         "it-IT"
                       )}
                     </div>
@@ -687,7 +697,7 @@ export default function AdminPage() {
           </div>
 
           <div className="space-y-8 p-6">
-            <div className="grid gap-4 md:grid-cols-3">
+            <div className="grid gap-4 md:grid-cols-4">
               <div>
                 <label className="mb-2 block text-sm font-semibold">
                   Numero partita
@@ -703,6 +713,23 @@ export default function AdminPage() {
                   }
                   className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-gray-800"
                   placeholder="3"
+                />
+              </div>
+
+              <div>
+                <label className="mb-2 block text-sm font-semibold">
+                  Data partita
+                </label>
+
+                <input
+                  type="date"
+                  value={matchDate}
+                  onChange={(e) =>
+                    setMatchDate(
+                      e.target.value
+                    )
+                  }
+                  className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-gray-800"
                 />
               </div>
 
@@ -757,12 +784,15 @@ export default function AdminPage() {
                       <th className="px-4 py-3">
                         Seleziona
                       </th>
+
                       <th className="px-4 py-3">
                         Giocatore
                       </th>
+
                       <th className="px-4 py-3">
                         Team
                       </th>
+
                       <th className="px-4 py-3">
                         Gol
                       </th>
@@ -837,6 +867,7 @@ export default function AdminPage() {
                                   <option value="A">
                                     Team A
                                   </option>
+
                                   <option value="B">
                                     Team B
                                   </option>
