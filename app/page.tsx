@@ -81,6 +81,24 @@ export default function Home() {
     }
   }
 
+  const scorers = [...players].sort((a, b) => {
+    const goalsPerMatchA =
+      a.matches > 0 ? a.goals / a.matches : 0;
+
+    const goalsPerMatchB =
+      b.matches > 0 ? b.goals / b.matches : 0;
+
+    if (goalsPerMatchB !== goalsPerMatchA) {
+      return goalsPerMatchB - goalsPerMatchA;
+    }
+
+    if (b.goals !== a.goals) {
+      return b.goals - a.goals;
+    }
+
+    return a.name.localeCompare(b.name);
+  });
+
   return (
     <main className="min-h-screen bg-gray-100 text-gray-900">
       <header className="border-b border-gray-200 bg-white">
@@ -105,6 +123,7 @@ export default function Home() {
       </header>
 
       <div className="mx-auto max-w-6xl px-4 py-8">
+
         {/* CLASSIFICA */}
 
         <section className="mb-8">
@@ -129,75 +148,191 @@ export default function Home() {
                   <thead className="bg-gray-50 text-sm text-gray-500">
                     <tr>
                       <th className="px-5 py-4">#</th>
-                      <th className="px-5 py-4">Giocatore</th>
+
+                      <th className="px-5 py-4">
+                        Giocatore
+                      </th>
+
                       <th className="px-5 py-4 text-center">
                         PG
                       </th>
+
                       <th className="px-5 py-4 text-center">
                         V
                       </th>
+
                       <th className="px-5 py-4 text-center">
                         P
                       </th>
+
                       <th className="px-5 py-4 text-center">
                         S
                       </th>
+
                       <th className="px-5 py-4 text-center">
                         Gol
                       </th>
+
                       <th className="px-5 py-4 text-center">
                         Pt
+                      </th>
+
+                      <th className="px-5 py-4 text-center">
+                        Pt/PG
                       </th>
                     </tr>
                   </thead>
 
                   <tbody>
-                    {players.map((player, index) => (
-                      <tr
-                        key={player.id}
-                        className="border-t border-gray-100 transition hover:bg-gray-50"
-                      >
-                        <td className="px-5 py-4 font-bold">
-                          {index + 1}
-                        </td>
+                    {players.map((player, index) => {
+                      const pointsPerMatch =
+                        player.matches > 0
+                          ? player.points / player.matches
+                          : 0;
 
-                        <td className="px-5 py-4">
-                          <div className="font-semibold">
-                            {player.name}
-                          </div>
+                      return (
+                        <tr
+                          key={player.id}
+                          className="border-t border-gray-100 transition hover:bg-gray-50"
+                        >
+                          <td className="px-5 py-4 font-bold">
+                            {index + 1}
+                          </td>
 
-                          {player.nickname && (
-                            <div className="text-sm text-gray-500">
-                              {player.nickname}
+                          <td className="px-5 py-4">
+                            <div className="font-semibold">
+                              {player.name}
                             </div>
-                          )}
-                        </td>
 
-                        <td className="px-5 py-4 text-center">
-                          {player.matches}
-                        </td>
+                            {player.nickname && (
+                              <div className="text-sm text-gray-500">
+                                {player.nickname}
+                              </div>
+                            )}
+                          </td>
 
-                        <td className="px-5 py-4 text-center">
-                          {player.wins}
-                        </td>
+                          <td className="px-5 py-4 text-center">
+                            {player.matches}
+                          </td>
 
-                        <td className="px-5 py-4 text-center">
-                          {player.draws}
-                        </td>
+                          <td className="px-5 py-4 text-center">
+                            {player.wins}
+                          </td>
 
-                        <td className="px-5 py-4 text-center">
-                          {player.losses}
-                        </td>
+                          <td className="px-5 py-4 text-center">
+                            {player.draws}
+                          </td>
 
-                        <td className="px-5 py-4 text-center font-semibold">
-                          {player.goals}
-                        </td>
+                          <td className="px-5 py-4 text-center">
+                            {player.losses}
+                          </td>
 
-                        <td className="px-5 py-4 text-center text-lg font-bold">
-                          {player.points}
-                        </td>
-                      </tr>
-                    ))}
+                          <td className="px-5 py-4 text-center font-semibold">
+                            {player.goals}
+                          </td>
+
+                          <td className="px-5 py-4 text-center text-lg font-bold">
+                            {player.points}
+                          </td>
+
+                          <td className="px-5 py-4 text-center font-semibold">
+                            {pointsPerMatch.toFixed(2)}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        </section>
+
+        {/* CLASSIFICA MARCATORI */}
+
+        <section className="mb-8">
+          <div className="mb-5">
+            <h2 className="text-3xl font-bold">
+              Classifica marcatori
+            </h2>
+
+            <p className="mt-1 text-gray-500">
+              Gol totali e media gol per partita
+            </p>
+          </div>
+
+          <div className="overflow-hidden rounded-2xl bg-white shadow-sm">
+            {loading ? (
+              <div className="p-6 text-gray-500">
+                Caricamento...
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left">
+                  <thead className="bg-gray-50 text-sm text-gray-500">
+                    <tr>
+                      <th className="px-5 py-4">#</th>
+
+                      <th className="px-5 py-4">
+                        Giocatore
+                      </th>
+
+                      <th className="px-5 py-4 text-center">
+                        PG
+                      </th>
+
+                      <th className="px-5 py-4 text-center">
+                        Gol
+                      </th>
+
+                      <th className="px-5 py-4 text-center">
+                        Gol/PG
+                      </th>
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    {scorers.map((player, index) => {
+                      const goalsPerMatch =
+                        player.matches > 0
+                          ? player.goals / player.matches
+                          : 0;
+
+                      return (
+                        <tr
+                          key={player.id}
+                          className="border-t border-gray-100 transition hover:bg-gray-50"
+                        >
+                          <td className="px-5 py-4 font-bold">
+                            {index + 1}
+                          </td>
+
+                          <td className="px-5 py-4">
+                            <div className="font-semibold">
+                              {player.name}
+                            </div>
+
+                            {player.nickname && (
+                              <div className="text-sm text-gray-500">
+                                {player.nickname}
+                              </div>
+                            )}
+                          </td>
+
+                          <td className="px-5 py-4 text-center">
+                            {player.matches}
+                          </td>
+
+                          <td className="px-5 py-4 text-center text-lg font-bold">
+                            {player.goals}
+                          </td>
+
+                          <td className="px-5 py-4 text-center font-semibold">
+                            {goalsPerMatch.toFixed(2)}
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
@@ -280,6 +415,7 @@ export default function Home() {
                       {/* GIOCATORI */}
 
                       <div className="mt-6 grid gap-4 sm:grid-cols-2">
+
                         {/* TEAM A */}
 
                         <div className="rounded-xl bg-gray-50 p-4">
@@ -349,4 +485,3 @@ export default function Home() {
     </main>
   );
 }
-
