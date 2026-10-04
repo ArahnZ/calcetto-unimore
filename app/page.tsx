@@ -81,7 +81,15 @@ export default function Home() {
     }
   }
 
+  // Classifica marcatori:
+  // 1. Gol totali
+  // 2. Gol per partita
+  // 3. Nome alfabetico
   const scorers = [...players].sort((a, b) => {
+    if (b.goals !== a.goals) {
+      return b.goals - a.goals;
+    }
+
     const goalsPerMatchA =
       a.matches > 0 ? a.goals / a.matches : 0;
 
@@ -92,15 +100,13 @@ export default function Home() {
       return goalsPerMatchB - goalsPerMatchA;
     }
 
-    if (b.goals !== a.goals) {
-      return b.goals - a.goals;
-    }
-
     return a.name.localeCompare(b.name);
   });
 
   return (
     <main className="min-h-screen bg-gray-100 text-gray-900">
+      {/* HEADER */}
+
       <header className="border-b border-gray-200 bg-white">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-5">
           <div>
@@ -124,7 +130,9 @@ export default function Home() {
 
       <div className="mx-auto max-w-6xl px-4 py-8">
 
+        {/* ========================= */}
         {/* CLASSIFICA */}
+        {/* ========================= */}
 
         <section className="mb-8">
           <div className="mb-5">
@@ -147,7 +155,9 @@ export default function Home() {
                 <table className="w-full text-left">
                   <thead className="bg-gray-50 text-sm text-gray-500">
                     <tr>
-                      <th className="px-5 py-4">#</th>
+                      <th className="px-5 py-4">
+                        #
+                      </th>
 
                       <th className="px-5 py-4">
                         Giocatore
@@ -248,7 +258,9 @@ export default function Home() {
           </div>
         </section>
 
+        {/* ========================= */}
         {/* CLASSIFICA MARCATORI */}
+        {/* ========================= */}
 
         <section className="mb-8">
           <div className="mb-5">
@@ -271,7 +283,9 @@ export default function Home() {
                 <table className="w-full text-left">
                   <thead className="bg-gray-50 text-sm text-gray-500">
                     <tr>
-                      <th className="px-5 py-4">#</th>
+                      <th className="px-5 py-4">
+                        #
+                      </th>
 
                       <th className="px-5 py-4">
                         Giocatore
@@ -340,7 +354,9 @@ export default function Home() {
           </div>
         </section>
 
+        {/* ========================= */}
         {/* PARTITE */}
+        {/* ========================= */}
 
         <section>
           <div className="mb-5">
@@ -396,7 +412,9 @@ export default function Home() {
                         </div>
 
                         <div className="flex items-center justify-center gap-4 text-lg font-bold">
-                          <span>Team A</span>
+                          <span>
+                            Team A
+                          </span>
 
                           <span className="rounded-xl bg-gray-100 px-5 py-3 text-2xl">
                             {match.team_a_score}
@@ -408,7 +426,9 @@ export default function Home() {
                             {match.team_b_score}
                           </span>
 
-                          <span>Team B</span>
+                          <span>
+                            Team B
+                          </span>
                         </div>
                       </div>
 
@@ -473,6 +493,7 @@ export default function Home() {
                             )}
                           </div>
                         </div>
+
                       </div>
                     </div>
                   );
@@ -481,6 +502,7 @@ export default function Home() {
             )}
           </div>
         </section>
+
       </div>
     </main>
   );
